@@ -32,8 +32,15 @@ function App() {
         return (
           <Home
             language={language}
-            onNavigate={setCurrentPage}
-            onOpenLanguageModal={() => setShowLanguageModal(true)}
+            onNavigate={(page: any, data?: any) => {
+              if (data?.resultId) {
+                // Result 페이지로 이동하는 경우
+                setCurrentPage("quiz");
+              } else {
+                setCurrentPage(page as Page);
+              }
+            }}
+            onLanguageChange={handleLanguageChange}
           />
         );
       case "quiz":

@@ -9,10 +9,9 @@ import './Quiz.css';
 interface QuizProps {
   language: 'ko' | 'en';
   onBack: () => void;
-  onNavigate: (page: string, data?: any) => void;
 }
 
-export default function Quiz({ language, onBack, onNavigate }: QuizProps) {
+export default function Quiz({ language, onBack }: QuizProps) {
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);

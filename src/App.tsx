@@ -4,12 +4,13 @@ import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
 import Documents from "./pages/Documents";
 import Procedures from "./pages/Procedures";
+import { Language } from "./i18n";
 
 type Page = "home" | "quiz" | "documents" | "procedures";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
-  const [language, setLanguage] = useState<"ko" | "en" | "zh">("ko");
+  const [language, setLanguage] = useState<Language>("ko");
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   useEffect(() => {
@@ -20,7 +21,7 @@ function App() {
     }
   }, []);
 
-  const handleLanguageChange = (lang: "ko" | "en" | "zh") => {
+  const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
     setShowLanguageModal(false);
   };
@@ -55,7 +56,7 @@ function App() {
       {showLanguageModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>Select Language / 언어 선택 / 选择语言</h2>
+            <h2>Select Language / 언어 선택</h2>
             <div className="language-buttons">
               <button
                 onClick={() => handleLanguageChange("ko")}
@@ -68,12 +69,6 @@ function App() {
                 className={language === "en" ? "active" : ""}
               >
                 English
-              </button>
-              <button
-                onClick={() => handleLanguageChange("zh")}
-                className={language === "zh" ? "active" : ""}
-              >
-                中文
               </button>
             </div>
           </div>

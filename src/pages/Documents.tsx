@@ -1,123 +1,107 @@
-import { t } from "../i18n";
-import "./Documents.css";
+import { useState, useEffect } from 'react';
+import { loadChecklistState, updateDocumentCheck, ChecklistState } from '../lib/checklist-service';
+import { getRequiredDocuments } from '../lib/permit-logic';
+import './Documents.css';
 
 interface DocumentsProps {
-  language: "ko" | "en" | "zh";
+  language: 'ko' | 'en';
   onBack: () => void;
 }
 
 export default function Documents({ language, onBack }: DocumentsProps) {
-  const documents = [
-    {
-      ko: "여권",
-      en: "Passport",
-      zh: "护照",
-      desc: {
-        ko: "유효한 여권 사본",
-        en: "Valid passport copy",
-        zh: "有效护照副本",
-      },
-    },
-    {
-      ko: "비자",
-      en: "Visa",
-      zh: "签证",
-      desc: {
-        ko: "유학생 비자 사본",
-        en: "Student visa copy",
-        zh: "学生签证副本",
-      },
-    },
-    {
-      ko: "학생증",
-      en: "Student ID",
-      zh: "学生证",
-      desc: {
-        ko: "현재 학기 학생증",
-        en: "Current semester student ID",
-        zh: "当前学期学生证",
-      },
-    },
-    {
-      ko: "학교 허가서",
-      en: "School Permission",
-      zh: "学校许可",
-      desc: {
-        ko: "학교에서 발급한 시간제 취업 허가서",
-        en: "Part-time work permission from school",
-        zh: "学校颁发的兼职工作许可",
-      },
-    },
-    {
-      ko: "은행 계좌",
-      en: "Bank Account",
-      zh: "银行账户",
-      desc: {
-        ko: "급여 입금용 한국 은행 계좌",
-        en: "Korean bank account for salary",
-        zh: "用于工资存入的韩国银行账户",
-      },
-    },
-  ];
+  const [checklist, setChecklist] = useState<ChecklistState>({});
+  const [documents, setDocuments] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const state = await loadChecklistState();
+      setChecklist(state || {});
+
+      // 모든 필요 서류 가져오기 (일반적인 경우)
+      const allDocs = getRequiredDocuments({
+        visaType: 'D-2',
+        courseType: 'undergraduate',
+        d2KoreanAbilityLevel1: 'topik3',
+        d21d22CertifiedOrExcellent: true,
+        gpaOk: true,
+        attendanceOk: true,
+        isVacation: false,
+        topikLevel: '3plus',
+      });
+      setDocuments(allDocs);
+    };
+    loadData();
+  }, []);
+
+  const handleDocumentCheck = async (index: number) => {
+    const current = checklist[String(index)] || false;
+    const updated = await updateDocumentCheck(String(index), !current);
+    setChecklist(updated || {});
+  };
+
+  const checkedCount = Object.values(checklist).filter(Boolean).length;
 
   return (
-    <div className="documents-page">
-      <button className="back-btn" onClick={onBack}>
-        ← {language === "ko" ? "돌아가기" : language === "en" ? "Back" : "返回"}
-      </button>
+    <div className="documents-container">
+      {/* 헤더 */}
+      <div className="documents-header">
+        <button className="back-button" onClick={onBack}>
+          ←
+        </button>
+        <h1>{language === 'ko' ? '필요 서류' : 'Required Documents'}</h1>
+        <div style={{ width: '24px' }} />
+      </div>
 
-      <div className="documents-container">
-        <h1>{t("documents.title", language)}</h1>
-        <p className="subtitle">{t("documents.subtitle", language)}</p>
+      {/* 진행 상황 */}
+      <div className="progress-card">
+        <div className="progress-text">
+          {language === 'ko' ? `준비 완료: ${checkedCount}/${documents.length}` : `Completed: ${checkedCount}/${documents.length}`}
+        </div>
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{
+              width: `${documents.length > 0 ? (checkedCount / documents.length) * 100 : 0}%`,
+            }}
+          />
+        </div>
+      </div>
 
-        <div className="documents-list">
-          {documents.map((doc, index) => {
-            const docName = doc[language as keyof typeof doc];
-            const docDesc = doc.desc[language as keyof typeof doc.desc];
+      {/* 서류 목록 */}
+      <div className="documents-section">
+        <h2 className="section-title">{language === 'ko' ? '필요한 서류' : 'Required Documents'}</h2>
+        <div className="document-list">
+          {documents.map((doc, idx) => {
+            const isChecked = checklist[String(idx)] || false;
             return (
-              <div key={index} className="document-item">
-                <div className="doc-number">{index + 1}</div>
-                <div className="doc-content">
-                  <h3>{typeof docName === 'string' ? docName : ''}</h3>
-                  <p>{typeof docDesc === 'string' ? docDesc : ''}</p>
+              <div
+                key={idx}
+                className={`document-item ${isChecked ? 'checked' : ''}`}
+                onClick={() => handleDocumentCheck(idx)}
+              >
+                <div className="checkbox">
+                  <input type="checkbox" checked={isChecked} readOnly />
+                </div>
+                <div className="document-content">
+                  <div className={`document-name ${isChecked ? 'strikethrough' : ''}`}>
+                    {typeof doc.name === 'string' ? doc.name : doc.name[language] || doc.name.en}
+                  </div>
+                  <div className={`document-desc ${isChecked ? 'strikethrough' : ''}`}>
+                    {typeof doc.description === 'string' ? doc.description : doc.description[language] || doc.description.en}
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
+      </div>
 
-        <div className="info-box">
-          <h3>
-            {language === "ko"
-              ? "주의사항"
-              : language === "en"
-              ? "Important Notes"
-              : "重要提示"}
-          </h3>
-          <ul>
-            <li>
-              {language === "ko"
-                ? "모든 서류는 원본 또는 공증 사본이어야 합니다."
-                : language === "en"
-                ? "All documents must be originals or certified copies."
-                : "所有文件必须是原件或公证副本。"}
-            </li>
-            <li>
-              {language === "ko"
-                ? "서류는 언제든 요청받을 수 있으므로 항상 준비해두세요."
-                : language === "en"
-                ? "Keep documents ready as they may be requested at any time."
-                : "随时准备好文件，因为可能随时被要求。"}
-            </li>
-            <li>
-              {language === "ko"
-                ? "학교 국제학생 담당부서에 확인하여 정확한 서류를 준비하세요."
-                : language === "en"
-                ? "Confirm with your school's international office for exact requirements."
-                : "与学校国际学生办公室确认准确的要求。"}
-            </li>
-          </ul>
-        </div>
+      {/* 안내 문구 */}
+      <div className="note-text">
+        ⚠️{' '}
+        {language === 'ko'
+          ? '각 서류의 구체적인 요구사항은 소속 대학교 국제교류팀, 출입국관리사무소 또는 하이코리아에 문의하세요.'
+          : 'For specific requirements of each document, please contact your university\'s international office, the Immigration Office, or HiKorea.'}
       </div>
     </div>
   );

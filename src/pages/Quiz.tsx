@@ -79,7 +79,8 @@ export default function Quiz({ language, onBack }: QuizProps) {
         notes: [],
       } as any;
       const savedResult = await saveResult(result);
-      onNavigate('result', { resultId: savedResult.id });
+      setLoading(false);
+      onBack(); // 결과 저장 후 홈으로 돌아감
       return;
     }
 
@@ -102,7 +103,8 @@ export default function Quiz({ language, onBack }: QuizProps) {
         notes: [],
       } as any;
       const savedResult = await saveResult(result);
-      onNavigate('result', { resultId: savedResult.id });
+      setLoading(false);
+      onBack(); // 결과 저장 후 홈으로 돌아감
       return;
     }
 
@@ -125,7 +127,8 @@ export default function Quiz({ language, onBack }: QuizProps) {
         notes: [],
       } as any;
       const savedResult = await saveResult(result);
-      onNavigate('result', { resultId: savedResult.id });
+      setLoading(false);
+      onBack(); // 결과 저장 후 홈으로 돌아감
       return;
     }
 
@@ -204,7 +207,8 @@ export default function Quiz({ language, onBack }: QuizProps) {
       } as any);
 
       const savedResult = await saveResult(result);
-      onNavigate('result', { resultId: savedResult.id });
+      setLoading(false);
+      onBack(); // 결과 저장 후 홈으로 돌아감
     }
   };
 

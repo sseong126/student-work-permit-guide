@@ -70,6 +70,12 @@ export default function Home({
 
       {/* Main Content */}
       <main className="main-content">
+        {/* Intro Card */}
+        <div className="intro-card">
+          <h2>{t('home.whatIs', language)}</h2>
+          <p>{t('home.whatIsDesc', language)}</p>
+        </div>
+
         {/* Notice Card */}
         <div className="notice-card">
           <div className="notice-icon">⚠️</div>
@@ -78,17 +84,12 @@ export default function Home({
               {notice[language].split('\n').map((line, idx) => (
                 <span key={idx}>
                   {line}
-                  {idx < notice[language].split('\n').length - 1 && <br />}
+                  {idx < notice[language].split('\n').length - 1 &&   
+}
                 </span>
               ))}
             </p>
           </div>
-        </div>
-
-        {/* Intro Card */}
-        <div className="intro-card">
-          <h2>{t('home.whatIs', language)}</h2>
-          <p>{t('home.whatIsDesc', language)}</p>
         </div>
 
         {/* Feature Grid */}
@@ -199,7 +200,7 @@ export default function Home({
         <button
           className="btn btn-feedback"
           onClick={() =>
-            window.open('https://forms.gle/6v2q5WcqKb6CC2QB8', '_blank')
+            window.open('https://forms.gle/6v2q5WcqKb6CC2QB8', '_blank' )
           }
           style={{
             marginTop: '20px',

@@ -69,7 +69,6 @@ export default function Documents({ language, onBack }: DocumentsProps) {
 
       {/* 서류 목록 */}
       <div className="documents-section">
-        <h2 className="section-title">{language === 'ko' ? '필요한 서류' : 'Required Documents'}</h2>
         <div className="document-list">
           {documents.map((doc, idx) => {
             const isChecked = checklist[String(idx)] || false;

@@ -37,6 +37,11 @@ export default function Home({
     onNavigate('procedures');
   };
 
+  const notice = {
+    ko: "유학(D-2) 또는 일반연수(D-4)는 학업을 목적으로 부여되는 체류자격이므로 아르바이트는 원칙적으로 금지됩니다. 그러나 일정한 요건을 갖춘 경우에만 아르바이트가 허용됩니다.\n근무를 시작하기 전에 반드시 출입국관리사무소의 사전 허가를 받아야 합니다. 허가 없이 일을 시작하는 것은 불법 취업으로 간주되며, 이 경우 고용주와 학생 모두에게 심각한 불이익(예: 강제 퇴거, 시간제 취업 제한 등)이 따르게 됩니다.\n직전학기 성적 기준치에 미달하거나 (일반적으로 C학점 미만) 과거 관련 규정 위반사례가 있는 경우 시간제 취업이 불허 또는 제한될 수 있습니다.",
+    en: "Since Study(D-2) or General Training(D-4) visas are granted for academic purposes, part-time work is strictly prohibited in principle. However, it is permitted only under specific requirements.\nYou must obtain prior authorization from the Immigration Office before starting work. Beginning work without permission is considered illegal employment, resulting in severe penalties (e.g., deportation, restrictions on part-time work) for both the employer and the student.\nIf your GPA from the previous semester falls below the standard (generally below C) or if you have a history of violating relevant regulations, your part-time work permit may be denied or restricted.",
+  };
+
   return (
     <div className="home-page">
       {/* Header */}
@@ -65,6 +70,21 @@ export default function Home({
 
       {/* Main Content */}
       <main className="main-content">
+        {/* Notice Card */}
+        <div className="notice-card">
+          <div className="notice-icon">⚠️</div>
+          <div className="notice-content">
+            <p className="notice-text">
+              {notice[language].split('\n').map((line, idx) => (
+                <span key={idx}>
+                  {line}
+                  {idx < notice[language].split('\n').length - 1 && <br />}
+                </span>
+              ))}
+            </p>
+          </div>
+        </div>
+
         {/* Intro Card */}
         <div className="intro-card">
           <h2>{t('home.whatIs', language)}</h2>
@@ -174,6 +194,28 @@ export default function Home({
             </button>
           </div>
         )}
+
+        {/* 피드백 버튼 */}
+        <button
+          className="btn btn-feedback"
+          onClick={() =>
+            window.open('https://forms.gle/6v2q5WcqKb6CC2QB8', '_blank')
+          }
+          style={{
+            marginTop: '20px',
+            padding: '12px 24px',
+            background: '#f0f0f0',
+            color: '#333',
+            border: '2px solid #ddd',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '14px',
+            width: '100%',
+          }}
+        >
+          {language === 'ko' ? '📝 피드백 보내기' : '📝 Send Feedback'}
+        </button>
       </main>
 
       {/* Footer */}

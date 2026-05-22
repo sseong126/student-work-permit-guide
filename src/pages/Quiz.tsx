@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-export default function WorkHourCalculator() {
-  const [lang, setLang] = useState('ko'); // 'ko' 또는 'en'
+interface QuizProps {
+  language: 'ko' | 'en';
+  onBack: () => void;
+}
+
+export default function WorkHourCalculator({ language, onBack }: QuizProps) {
+  const [lang, setLang] = useState(language); // 'ko' 또는 'en'
   const [step, setStep] = useState(1);
   const [visa, setVisa] = useState('');
   const [periodUnder6Months, setPeriodUnder6Months] = useState(null);
@@ -16,6 +21,12 @@ export default function WorkHourCalculator() {
     setGrade(''); setHasLanguage(null); setHasSpecialCondition(null); setWorkPeriod('');
   };
 
+  const goBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
   // 다국어 텍스트 사전
   const t = {
     ko: {
@@ -25,6 +36,7 @@ export default function WorkHourCalculator() {
       unlimitedNotice: "💡 출입국사무소에서 허가받은 시간제 취업허가서의 근로계약 기간 내에 포함된 주말, 방학기간 동안 시간제한 없이 일을 할 수 있다는 의미입니다.",
       btnReset: "다시 계산하기",
       btnHome: "처음으로",
+      btnBack: "이전 단계로",
       invalidTitle: "❌ 시간제 취업 불가",
       footer1: "⚠️ 해당 테스트는 서울외국인주민센터(Seoul Foreign Resident Center)에서 배포한 자료를 바탕으로 구성되었습니다. 각 개인의 상황과 일치하지 않을 수 있으니 참고용으로만 사용하시기를 권장합니다.",
       footer2: "⚠️ 유학생의 국내 근로를 위해서는 일정 성적 기준 이상을 충족하는 것이 필수적입니다. 대부분의 학교가 직전 학기 평균 성적 C학점(2.0) 이상을 요구하지만 학교마다 기준이 상이할 수 있으니 직접 확인하시길 권장합니다.",
@@ -50,7 +62,8 @@ export default function WorkHourCalculator() {
       unlimited: "Unlimited work hours allowed per week",
       unlimitedNotice: "💡 This means you can work without time restrictions during weekends and vacations included in the duration of the part-time work permit authorized by the Immigration Office.",
       btnReset: "Calculate Again",
-      btnHome: "Go to Start",
+      btnHome: "Go to Home",
+      btnBack: "Back to Previous Step",
       invalidTitle: "❌ Part-time Work Not Allowed",
       footer1: "⚠️ This test is based on materials distributed by the Seoul Foreign Resident Center. It may not match every individual's specific situation, so please use it for reference only.",
       footer2: "⚠️ It is essential for international students to meet certain academic standards to work in Korea. Most schools require a GPA of C (2.0) or higher in the previous semester, but standards vary by school, so it is recommended to check directly.",
@@ -113,7 +126,10 @@ export default function WorkHourCalculator() {
             {t[lang].unlimitedNotice}
           </p>
         )}
-        <button onClick={resetCalc} style={{ marginTop: '15px', padding: '10px 20px', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>{t[lang].btnReset}</button>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+          <button onClick={resetCalc} style={{ flex: 1, padding: '10px 20px', background: '#0070f3', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>{t[lang].btnReset}</button>
+          <button onClick={onBack} style={{ flex: 1, padding: '10px 20px', background: '#666', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>{t[lang].btnHome}</button>
+        </div>
         {commonFooter}
       </div>
     );
@@ -122,9 +138,12 @@ export default function WorkHourCalculator() {
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '600px', margin: '0 auto', border: '1px solid #eee', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', backgroundColor: '#fff', overflow: 'hidden' }}>
       {/* 상단 언어 토글 바 */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', background: '#f8f9fa', padding: '10px 20px', borderBottom: '1px solid #eee' }}>
-        <button onClick={() => setLang('ko')} style={{ padding: '4px 10px', marginRight: '5px', background: lang === 'ko' ? '#0070f3' : '#fff', color: lang === 'ko' ? '#fff' : '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>KO</button>
-        <button onClick={() => setLang('en')} style={{ padding: '4px 10px', background: lang === 'en' ? '#0070f3' : '#fff', color: lang === 'en' ? '#fff' : '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>EN</button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8f9fa', padding: '10px 20px', borderBottom: '1px solid #eee' }}>
+        <button onClick={onBack} style={{ padding: '4px 10px', background: '#fff', color: '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>← {lang === 'ko' ? '돌아가기' : 'Back'}</button>
+        <div>
+          <button onClick={() => setLang('ko')} style={{ padding: '4px 10px', marginRight: '5px', background: lang === 'ko' ? '#0070f3' : '#fff', color: lang === 'ko' ? '#fff' : '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>KO</button>
+          <button onClick={() => setLang('en')} style={{ padding: '4px 10px', background: lang === 'en' ? '#0070f3' : '#fff', color: lang === 'en' ? '#fff' : '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>EN</button>
+        </div>
       </div>
 
       {/* 1단계: 비자 선택 */}
@@ -146,12 +165,16 @@ export default function WorkHourCalculator() {
           <h3>{t[lang].qD41Period}</h3>
           <button onClick={() => setPeriodUnder6Months(true)} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{lang === 'ko' ? "1. 6개월 미만 경과" : "1. Less than 6 months"}</button>
           <button onClick={() => { setPeriodUnder6Months(false); setStep(4); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{lang === 'ko' ? "2. 6개월 이상 경과" : "2. 6 months or more"}</button>
+          <button onClick={goBack} style={{ display: 'block', width: '100%', padding: '10px', margin: '15px 0 0 0', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>{t[lang].btnBack}</button>
           
           {periodUnder6Months && (
             <div style={{ marginTop: '20px', padding: '20px', border: '2px solid #ff4d4f', borderRadius: '10px', backgroundColor: '#fff1f0' }}>
               <h3 style={{ color: '#ff4d4f', marginTop: 0 }}>{t[lang].invalidTitle}</h3>
               <p style={{ fontWeight: 'bold', lineHeight: '1.6', fontSize: '14px' }}>"{t[lang].d41Fail}"</p>
-              <button onClick={resetCalc} style={{ marginTop: '15px', padding: '8px 15px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnHome}</button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                <button onClick={resetCalc} style={{ flex: 1, padding: '8px 15px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnReset}</button>
+                <button onClick={onBack} style={{ flex: 1, padding: '8px 15px', background: '#666', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnHome}</button>
+              </div>
               {commonFooter}
             </div>
           )}
@@ -164,12 +187,16 @@ export default function WorkHourCalculator() {
           <h3>{t[lang].qGpa}</h3>
           <button onClick={() => { setGpaOverC(true); setStep(visa === 'D-2-2' ? 3.5 : 4); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{t[lang].optYes}</button>
           <button onClick={() => setGpaOverC(false)} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{t[lang].optNo}</button>
+          <button onClick={goBack} style={{ display: 'block', width: '100%', padding: '10px', margin: '15px 0 0 0', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>{t[lang].btnBack}</button>
 
           {gpaOverC === false && (
             <div style={{ marginTop: '20px', padding: '20px', border: '2px solid #ff4d4f', borderRadius: '10px', backgroundColor: '#fff1f0' }}>
               <h3 style={{ color: '#ff4d4f', marginTop: 0 }}>{t[lang].invalidTitle}</h3>
               <p style={{ fontWeight: 'bold', lineHeight: '1.6', fontSize: '14px' }}>"{t[lang].gpaFail}"</p>
-              <button onClick={resetCalc} style={{ marginTop: '15px', padding: '8px 15px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnHome}</button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                <button onClick={resetCalc} style={{ flex: 1, padding: '8px 15px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnReset}</button>
+                <button onClick={onBack} style={{ flex: 1, padding: '8px 15px', background: '#666', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnHome}</button>
+              </div>
               {commonFooter}
             </div>
           )}
@@ -183,12 +210,16 @@ export default function WorkHourCalculator() {
           <button onClick={() => { setGrade('1-2'); setStep(4); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{lang === 'ko' ? "1. 1-2학년" : "1. Freshman / Sophomore (1st-2nd Year)"}</button>
           <button onClick={() => { setGrade('3-4'); setStep(4); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{lang === 'ko' ? "2. 3-4학년" : "2. Junior / Senior (3rd-4th Year)"}</button>
           <button onClick={() => setGrade('over')} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{lang === 'ko' ? "3. 초과학기자" : "3. Extra Semester Student"}</button>
+          <button onClick={goBack} style={{ display: 'block', width: '100%', padding: '10px', margin: '15px 0 0 0', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>{t[lang].btnBack}</button>
 
           {grade === 'over' && (
             <div style={{ marginTop: '20px', padding: '20px', border: '2px solid #ff4d4f', borderRadius: '10px', backgroundColor: '#fff1f0' }}>
               <h3 style={{ color: '#ff4d4f', marginTop: 0 }}>{t[lang].invalidTitle}</h3>
               <p style={{ fontWeight: 'bold', lineHeight: '1.6', fontSize: '14px' }}>"{t[lang].gradeFail}"</p>
-              <button onClick={resetCalc} style={{ marginTop: '15px', padding: '8px 15px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnHome}</button>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                <button onClick={resetCalc} style={{ flex: 1, padding: '8px 15px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnReset}</button>
+                <button onClick={onBack} style={{ flex: 1, padding: '8px 15px', background: '#666', color: '#fff', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>{t[lang].btnHome}</button>
+              </div>
               {commonFooter}
             </div>
           )}
@@ -210,6 +241,7 @@ export default function WorkHourCalculator() {
             </button>
           ))}
           <button onClick={() => { setHasLanguage(false); setStep(5); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{t[lang].optLangNone}</button>
+          <button onClick={goBack} style={{ display: 'block', width: '100%', padding: '10px', margin: '15px 0 0 0', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>{t[lang].btnBack}</button>
         </div>
       )}
 
@@ -219,6 +251,7 @@ export default function WorkHourCalculator() {
           <h3>{t[lang].qSpecial}</h3>
           <button onClick={() => { setHasSpecialCondition(true); setStep(6); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{t[lang].optYes}</button>
           <button onClick={() => { setHasSpecialCondition(false); setStep(6); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{t[lang].optNo}</button>
+          <button onClick={goBack} style={{ display: 'block', width: '100%', padding: '10px', margin: '15px 0 0 0', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>{t[lang].btnBack}</button>
         </div>
       )}
 
@@ -228,6 +261,7 @@ export default function WorkHourCalculator() {
           <h3>{t[lang].qPeriod}</h3>
           <button onClick={() => { setWorkPeriod('vacation'); setStep(7); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{t[lang].periodVacation}</button>
           <button onClick={() => { setWorkPeriod('semester'); setStep(7); }} style={{ display: 'block', width: '100%', padding: '14px', margin: '10px 0', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', textAlign: 'left' }}>{t[lang].periodSemester}</button>
+          <button onClick={goBack} style={{ display: 'block', width: '100%', padding: '10px', margin: '15px 0 0 0', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}>{t[lang].btnBack}</button>
         </div>
       )}
 

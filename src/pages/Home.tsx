@@ -15,23 +15,6 @@ export default function Home({
   onLanguageChange,
 }: HomeProps) {
   const [latestResult, setLatestResult] = useState<SavedResult | null>(null);
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
-
-  // 앱 처음 실행 시 언어 선택 모달 표시
-  useEffect(() => {
-    const checkFirstRun = async () => {
-      try {
-        const hasSeenLanguageModal = localStorage.getItem('hasSeenLanguageModal');
-        if (!hasSeenLanguageModal) {
-          setShowLanguageModal(true);
-          localStorage.setItem('hasSeenLanguageModal', 'true');
-        }
-      } catch (error) {
-        console.error('Failed to check first run:', error);
-      }
-    };
-    checkFirstRun();
-  }, []);
 
   // 최근 결과 로드
   useEffect(() => {
@@ -54,48 +37,27 @@ export default function Home({
     onNavigate('procedures');
   };
 
-  const handleLanguageChange = (lang: 'ko' | 'en') => {
-    onLanguageChange(lang);
-    setShowLanguageModal(false);
-  };
-
   return (
     <div className="home-page">
-      {/* 언어 선택 모달 */}
-      {showLanguageModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>{language === 'ko' ? '언어 선택' : 'Select Language'}</h2>
-            <div className="language-buttons">
-              <button
-                onClick={() => handleLanguageChange('ko')}
-                className={language === 'ko' ? 'active' : ''}
-              >
-                한국어
-              </button>
-              <button
-                onClick={() => handleLanguageChange('en')}
-                className={language === 'en' ? 'active' : ''}
-              >
-                English
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <header className="header">
         <div className="header-content">
           <div className="header-top">
             <h1 className="app-title">{t('home.heroTitle', language)}</h1>
-            <button
-              className="language-btn"
-              onClick={() => setShowLanguageModal(true)}
-              title={language === 'ko' ? '언어 변경' : 'Change language'}
-            >
-              🌐
-            </button>
+            <div className="language-selector">
+              <button
+                className={`lang-btn ${language === 'ko' ? 'active' : ''}`}
+                onClick={() => onLanguageChange('ko')}
+              >
+                한국어
+              </button>
+              <button
+                className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+                onClick={() => onLanguageChange('en')}
+              >
+                English
+              </button>
+            </div>
           </div>
           <p className="app-subtitle">{t('home.heroSubtitle', language)}</p>
         </div>
